@@ -1,8 +1,23 @@
 import matplotlib.pyplot as plt
-
 from ELE2MAELE import *
 def mean(list1):
     return sum(list1)/len(list1)
+
+test=[]
+for M in [1,2,3]:
+    test_resultlist=mean(load_agent(str(M)+'test_resultlist.pkl'))
+    Qtest_resultlist=sum((load_agent(str(M)+'Qtest_resultlist.pkl'))[:32]+(load_agent(str(M)+'Qtest_resultlist.pkl'))[-32:])
+    test.append(Qtest_resultlist)
+    test.append(test_resultlist)
+colors = ['blue','orange']*3
+timeaxis=['Q1','D1','Q2','D2','Q3','D3',]
+plt.bar(timeaxis,test,color=colors,width=0.7)
+plt.ylabel('Reward')
+plt.xlabel('Number of Users devices')
+plt.show()
+
+
+
 Energy=[]
 Utility=[]
 Latency=[]
@@ -15,6 +30,10 @@ OEnergy=[]
 OUtility=[]
 OLatency=[]
 OPrivacy=[]
+QEnergy=[]
+QUtility=[]
+QLatency=[]
+QPrivacy=[]
 for L in range(10000,30000,1500):
     Energylist=load_agent(str(L)+'Energylist.pkl')
     Utilitylist=load_agent(str(L)+'Utilitylist.pkl')
@@ -34,6 +53,15 @@ for L in range(10000,30000,1500):
     OLatency.append(mean(OLatencylist))
     OPrivacy.append(mean(OPrivacylist))
 
+    QEnergylist=load_agent(str(L)+'QEnergylist.pkl')
+    QUtilitylist=load_agent(str(L)+'QUtilitylist.pkl')
+    QLatencylist=load_agent(str(L)+'QLatencylist.pkl')
+    QPrivacylist=load_agent(str(L)+'QPrivacylist.pkl')
+    QEnergy.append(mean(QEnergylist))
+    QUtility.append(mean(QUtilitylist))
+    QLatency.append(mean(QLatencylist))
+    QPrivacy.append(mean(QPrivacylist))
+
     LEnergylist=load_agent(str(L)+'LEnergylist.pkl')
     LUtilitylist=load_agent(str(L)+'LUtilitylist.pkl')
     LLatencylist=load_agent(str(L)+'LLatencylist.pkl')
@@ -42,13 +70,13 @@ for L in range(10000,30000,1500):
     LUtility.append(mean(LUtilitylist))
     LLatency.append(mean(LLatencylist))
     LPrivacy.append(mean(LPrivacylist))
-
 timeaxis=torch.linspace(1,3,len(Energy))
 
 
 plt.plot(timeaxis,Utility,label='DQN')
 plt.plot(timeaxis,OUtility,label='Offloading Execution')
 plt.plot(timeaxis,LUtility,label='Local Execution')
+plt.plot(timeaxis,QUtility,label='Q-Learning')
 plt.title('Utility')
 plt.xlabel('L(x10000 Cycles/bit)')
 plt.legend()
@@ -57,6 +85,7 @@ plt.show()
 plt.plot(timeaxis,Latency,label='DQN')
 plt.plot(timeaxis,OLatency,label='Offloading Execution')
 plt.plot(timeaxis,LLatency,label='Local Execution')
+plt.plot(timeaxis,QLatency,label='Q-Learning')
 plt.title('Latency(ms)')
 plt.xlabel('L(x10000 Cycles/bit)')
 plt.legend()
@@ -66,6 +95,7 @@ plt.show()
 plt.plot(timeaxis,Energy,label='DQN')
 plt.plot(timeaxis,OEnergy,label='Offloading Execution')
 plt.plot(timeaxis,LEnergy,label='Local Execution')
+plt.plot(timeaxis,QEnergy,label='Q-Learning')
 plt.title('Energy Consumption(J)')
 plt.xlabel('L(x10000 Cycles/bit)')
 plt.legend()
@@ -74,6 +104,7 @@ plt.show()
 plt.plot(timeaxis,Privacy,label='DQN')
 plt.plot(timeaxis,OPrivacy,label='Offloading Execution')
 plt.plot(timeaxis,LPrivacy,label='Local Execution')
+plt.plot(timeaxis,QPrivacy,label='Q-Learning')
 plt.title('Privacy level')
 plt.xlabel('L(x10000 Cycles/bit)')
 plt.legend()
@@ -114,14 +145,12 @@ for i in range(len(test_resultlist)//200):
     showlist.append(np.mean(test_resultlist[200*i:200*(i+1)]))
 timeaxis=torch.linspace(0,10000,len(showlist))
 plt.plot(timeaxis,showlist,label='Deep RL Offloading',color='orange',linestyle='--',marker='o')
-
 test_resultlist=load_agent(str(L)+'Qtest_resultlist.pkl')
 showlist=[]
 showlist1=[]
 # plt.plot(test_resultlist)
 for i in range(len(test_resultlist)//64):
     showlist.append(sum(test_resultlist[64*i:64*(i+1)]))
-
 # for i in range(len(showlist)-100):
 #     showlist1.append(np.mean(showlist[i:(i+100)]))
 for i in range(len(showlist)//200):
@@ -143,3 +172,4 @@ plt.ylabel('Energy(J)')
 plt.xlabel('Time Slot')
 plt.legend()
 plt.show()
+
